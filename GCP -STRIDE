@@ -1,0 +1,10 @@
+# STRIDE Threat Model – LLM Guardrails on GCP
+
+| Category | GCP-specific threat | Mitigation / control | GCP services |
+|---------|---------------------|----------------------|--------------|
+| S – Spoofing | Stolen service account key used to call Vertex AI or guardrail APIs. | Service account key avoidance (workload identity), IAM least privilege, short-lived tokens, mTLS between components. | IAM, Vertex AI, GKE/Cloud Run, Cloud Endpoints |
+| T – Tampering | Malicious update to Cloud Run / GKE images for guardrails; edited configs in Secret Manager or Config Controller. | Binary/image authorization, CI/CD with approvals, restricted IAM on Secret Manager and configs, org policies and audit logs. | Cloud Run, GKE, Secret Manager, Audit Logs |
+| R – Repudiation | Incomplete logs for tool calls or Vertex AI calls, making incident investigation hard. | Cloud Audit Logs enabled for relevant services, structured app logs to Cloud Logging with correlation IDs, export to BigQuery/SIEM. | Cloud Logging, Cloud Audit Logs, BigQuery |
+| I – Information disclosure | Public GCS buckets with logs or datasets; RAG over-shares data across projects/tenants. | Private GCS buckets, VPC Service Controls, DLP API for scans, KMS for encryption, tenant-scoped indexes and datasets. | GCS, DLP API, KMS, Vertex AI, VPC SC |
+| D – Denial of service | Unthrottled Cloud Endpoints/API Gateway in front of orchestrator; autoscaling misconfigurations. | Quotas and rate limits at API level, Cloud Armor for filtering and basic DDoS protection, proper autoscaling configs. | API Gateway/Endpoints, Cloud Armor, Cloud Run/GKE |
+| E – Elevation of privilege | Guardrail or tool service account granted broad project-level roles (e.g., Editor). | Principle of least privilege, custom IAM roles per tool, per-project/per-tenant service accounts, approvals for high-risk actions. | IAM, Cloud Run/GKE, Vertex AI, Cloud SQL/Firestore |
