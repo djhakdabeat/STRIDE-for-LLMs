@@ -1,0 +1,10 @@
+# STRIDE Threat Model – Common LLM Guardrails
+
+| Category | Threat example (LLM + guardrails) | Mitigation / control | Components |
+|---------|------------------------------------|----------------------|------------|
+| S – Spoofing | Attacker reuses stolen token to call LLM with victim’s identity and tools. | Strong auth, short-lived tokens, mTLS between components, per-tenant and per-role authorization in orchestrator/tool gateway. | API GW, IdP, orchestrator, tool gateway |
+| T – Tampering | Prompt injection / jailbreak modifies system behaviour; hostile RAG docs inject new instructions. | Input classifiers, jailbreak rules, context isolation, pre-filtering of retrieved docs, change control on system prompts and guardrail policies. | Input guardrails, RAG, config store |
+| R – Repudiation | No reliable record of who triggered a sensitive tool call. | Structured, tamper-evident logs for prompts, decisions, tool calls; correlation IDs; time-stamped records and access control on logs. | Orchestrator, guardrails, logging stack |
+| I – Information disclosure | LLM leaks PII/secrets from tools or RAG; system prompt exposure. | DLP/PII detection on in/out, redaction/tokenization, strict data scoping per tenant/user, rules preventing system prompt disclosure, anonymized logs. | Output guardrails, DLP, RAG, logs |
+| D – Denial of service | Flooding prompts or adversarial inputs exhaust guardrail/LLM resources. | Rate limits and quotas per user/tenant/key, size limits, early rejection at edge, resource isolation, anomaly detection on traffic. | API GW, guardrails, LLM infra |
+| E – Elevation of privilege | LLM triggers higher-privilege tool actions than caller is allowed. | Policy engine before all tool calls, fine-grained tools, binding actions to caller identity, step-up auth or human approval for high-risk actions. | Policy engine, tool gateway, authZ |
