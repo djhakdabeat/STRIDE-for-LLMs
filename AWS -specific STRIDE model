@@ -1,0 +1,10 @@
+# STRIDE Threat Model – LLM Guardrails on AWS
+
+| Category | AWS-specific threat | Mitigation / control | AWS services |
+|---------|---------------------|----------------------|--------------|
+| S – Spoofing | Compromised IAM user/role calling Bedrock or guardrail APIs with excessive permissions. | IAM least privilege, IAM roles with scoped policies, AWS SSO/OIDC, STS short-lived creds, mTLS/SigV4 between components. | IAM, STS, Bedrock, API Gateway, ALB |
+| T – Tampering | Modified Lambda / container image for guardrails; altered config in SSM/Secrets Manager. | CodePipeline with approvals, image signing, restricted write access to SSM/Secrets Manager, CloudTrail alerts on config changes. | Lambda, ECS/EKS, SSM, Secrets Manager, CloudTrail |
+| R – Repudiation | Missing logs for sensitive tool calls or Bedrock invocations. | CloudTrail + CloudWatch Logs for API calls, app logs with correlation IDs, centralized logging in S3/SIEM, immutable log buckets. | CloudTrail, CloudWatch, S3, Security Lake |
+| I – Information disclosure | S3 buckets with training data/logs world-readable or cross-account; overly broad RAG access. | Private S3 buckets, bucket policies, VPC endpoints, Macie/DLP, per-tenant prefixes, KMS encryption, RAG queries filtered by tenant and role. | S3, Macie, KMS, VPC, Bedrock/RAG store |
+| D – Denial of service | Unthrottled API Gateway or ALB fronting LLM orchestrator; no WAF protections. | API GW and ALB throttling, AWS WAF rules and rate-based rules, auto scaling for ECS/EKS/Lambda, Shield for volumetric attacks. | API Gateway, ALB, WAF, Shield, ECS/EKS/Lambda |
+| E – Elevation of privilege | Over-privileged Lambda/ECS task role allowing arbitrary RDS/DynamoDB access via tool calls. | Fine-grained IAM for task roles, separate roles per tool, policy conditions (tenant, resource), approvals for high-risk actions. | IAM, RDS, DynamoDB, tool gateway, Lambda/ECS |
