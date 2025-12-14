@@ -1,0 +1,18 @@
+llm-stride-threat-model-aws-gcp/
+├── README.md
+├── docs/
+│   ├── architecture-aws.md
+│   ├── architecture-gcp.md
+│   ├── data-flows.md
+│   └── assumptions-and-scope.md
+├── models/
+│   ├── stride-llm-aws.md
+│   ├── stride-llm-gcp.md
+│   └── stride-llm-common.md
+├── tables/
+│   ├── stride-llm-aws.csv
+│   ├── stride-llm-gcp.csv
+│   └── stride-llm-common.csv
+└── diagrams/
+    ├── llm-guardrails-aws.drawio
+    └── llm-guardrails-gcp.drawio
